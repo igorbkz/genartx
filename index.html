@@ -47,6 +47,19 @@
             margin: 5px;
             cursor: pointer;
         }
+        .refresh-button {
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .history-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -54,7 +67,10 @@
     <input type="text" id="prompt" placeholder="Digite sua descrição de imagem aqui">
     <button onclick="generateImage()">Gerar Imagem</button>
     <div id="result"></div>
-    <h2>Histórico de Imagens</h2>
+    <div class="history-header">
+        <h2>Histórico de Imagens</h2>
+        <button class="refresh-button" onclick="clearHistory()" title="Limpar histórico">🔄</button>
+    </div>
     <div id="history"></div>
 
     <script>
@@ -76,8 +92,18 @@
 
         let imageHistory = JSON.parse(localStorage.getItem('imageHistory')) || [];
 
-        function updateHistory(imageUrl, prompt) {
-            imageHistory.unshift({ url: imageUrl, prompt: prompt });
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function updateHistory(imageBlob, prompt) {
+            const base64Image = await blobToBase64(imageBlob);
+            imageHistory.unshift({ url: base64Image, prompt: prompt });
             if (imageHistory.length > 20) {
                 imageHistory.pop();
             }
@@ -116,11 +142,17 @@
                 const response = await query({"inputs": prompt});
                 const imageUrl = URL.createObjectURL(response);
                 resultDiv.innerHTML = `<img src="${imageUrl}" alt="Imagem gerada">`;
-                updateHistory(imageUrl, prompt);
+                await updateHistory(response, prompt);
             } catch (error) {
                 resultDiv.innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
                 console.error('Erro:', error);
             }
+        }
+
+        function clearHistory() {
+            imageHistory = [];
+            localStorage.removeItem('imageHistory');
+            displayHistory();
         }
 
         // Exibir o histórico ao carregar a página
