@@ -6,39 +6,57 @@
     <title>flux.01</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             text-align: center;
+            background-color: #2c2c2c;
+            color: #ffffff;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 30px;
         }
         input[type="text"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #3a3a3a;
+            color: #ffffff;
+            font-size: 16px;
         }
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #45a049;
         }
         #result {
-            margin-top: 20px;
+            margin-top: 30px;
+            background-color: #3a3a3a;
+            padding: 20px;
+            border-radius: 5px;
         }
         img {
             max-width: 100%;
             height: auto;
+            border-radius: 5px;
         }
         #history {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 30px;
         }
         #history img {
             width: 150px;
@@ -46,6 +64,11 @@
             object-fit: cover;
             margin: 5px;
             cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        #history img:hover {
+            transform: scale(1.05);
         }
         .refresh-button {
             font-size: 24px;
@@ -53,19 +76,24 @@
             border: none;
             cursor: pointer;
             padding: 5px 10px;
+            color: #4CAF50;
         }
         .history-header {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
+            margin-top: 30px;
+        }
+        p {
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <h1>flux.01</h1>
     <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
-    <button onclick="generateImage()">Gerar Imagem</button>
+    <button onclick="enhanceAndGenerateImage()">Gerar Imagem</button>
     <div id="result"></div>
     <div class="history-header">
         <h2>Histórico de Imagens</h2>
@@ -74,12 +102,14 @@
     <div id="history"></div>
 
     <script>
+        const HF_TOKEN = "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";
+
         async function query(data) {
             const response = await fetch(
                 "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev",
                 {
                     headers: {
-                        Authorization: "Bearer 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",
+                        Authorization: `Bearer ${HF_TOKEN}`,
                         "Content-Type": "application/json",
                     },
                     method: "POST",
@@ -130,6 +160,64 @@
                 <img src="${url}" alt="Imagem em tamanho completo">
                 <p>Prompt: ${prompt}</p>
             `;
+        }
+
+        async function enhancePrompt(userPrompt) {
+            const response = await fetch(
+                "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
+                {
+                    headers: {
+                        Authorization: `Bearer ${HF_TOKEN}`,
+                        "Content-Type": "application/json",
+                    },
+                    method: "POST",
+                    body: JSON.stringify({
+                        inputs: `You are an AI assistant helping users create perfect image prompts. Your task is to interpret the user's intention and create a detailed, vivid description for image generation.
+
+                        Guidelines:
+                        1. Interpret the user's intention behind the prompt.
+                        2. Create a concise but vivid description in 1-2 sentences.
+                        3. Include specific visual details like colors, composition, and mood.
+                        4. If the prompt is abstract, translate it into a concrete visual representation.
+                        5. Write in English and avoid quotes or excessive punctuation.
+                        6. Start directly with the description.
+
+                        Original prompt: "${userPrompt}"
+                        
+                        Enhanced prompt:`,
+                        parameters: {
+                            max_new_tokens: 75,
+                            return_full_text: false,
+                        },
+                    }),
+                }
+            );
+            const result = await response.json();
+            return result[0].generated_text.trim();
+        }
+
+        async function enhanceAndGenerateImage() {
+            const userPrompt = document.getElementById('prompt').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = 'Aprimorando o prompt...';
+            
+            try {
+                const enhancedPrompt = await enhancePrompt(userPrompt);
+                resultDiv.innerHTML = 'Gerando imagem com o prompt aprimorado...';
+                
+                const response = await query({"inputs": enhancedPrompt});
+                const imageUrl = URL.createObjectURL(response);
+                resultDiv.innerHTML = `
+                    <img src="${imageUrl}" alt="Imagem gerada">
+                    <p>Prompt original: ${userPrompt}</p>
+                    <p>Prompt aprimorado: ${enhancedPrompt}</p>
+                `;
+                await updateHistory(response, enhancedPrompt);
+            } catch (error) {
+                resultDiv.innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
+                console.error('Erro:', error);
+            }
         }
 
         async function generateImage() {
