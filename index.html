@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Imagens AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        #history {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        #history img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gerador de Imagens AI</h1>
+    <input type="text" id="prompt" placeholder="Digite sua descrição de imagem aqui">
+    <button onclick="generateImage()">Gerar Imagem</button>
+    <div id="result"></div>
+    <h2>Histórico de Imagens</h2>
+    <div id="history"></div>
+
+    <script>
+        async function query(data) {
+            const response = await fetch(
+                "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev",
+                {
+                    headers: {
+                        Authorization: "Bearer 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",
+                        "Content-Type": "application/json",
+                    },
+                    method: "POST",
+                    body: JSON.stringify(data),
+                }
+            );
+            const result = await response.blob();
+            return result;
+        }
+
+        let imageHistory = JSON.parse(localStorage.getItem('imageHistory')) || [];
+
+        function updateHistory(imageUrl, prompt) {
+            imageHistory.unshift({ url: imageUrl, prompt: prompt });
+            if (imageHistory.length > 20) {
+                imageHistory.pop();
+            }
+            localStorage.setItem('imageHistory', JSON.stringify(imageHistory));
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const historyDiv = document.getElementById('history');
+            historyDiv.innerHTML = '';
+            imageHistory.forEach((item, index) => {
+                const img = document.createElement('img');
+                img.src = item.url;
+                img.alt = `Imagem ${index + 1}`;
+                img.title = item.prompt;
+                img.onclick = () => showFullImage(item.url, item.prompt);
+                historyDiv.appendChild(img);
+            });
+        }
+
+        function showFullImage(url, prompt) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <img src="${url}" alt="Imagem em tamanho completo">
+                <p>Prompt: ${prompt}</p>
+            `;
+        }
+
+        async function generateImage() {
+            const prompt = document.getElementById('prompt').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = 'Gerando imagem...';
+            
+            try {
+                const response = await query({"inputs": prompt});
+                const imageUrl = URL.createObjectURL(response);
+                resultDiv.innerHTML = `<img src="${imageUrl}" alt="Imagem gerada">`;
+                updateHistory(imageUrl, prompt);
+            } catch (error) {
+                resultDiv.innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
+                console.error('Erro:', error);
+            }
+        }
+
+        // Exibir o histórico ao carregar a página
+        displayHistory();
+    </script>
+</body>
+</html>
