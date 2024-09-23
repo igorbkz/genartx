@@ -95,13 +95,83 @@
         p {
             margin: 10px 0;
         }
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .mode-label {
+            margin-left: 10px;
+            vertical-align: super;
+        }
     </style>
 </head>
 <body>
     <h1>flux.01</h1>
     <div class="input-container">
         <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
-        <button onclick="enhanceAndGenerateImage()">Gerar Imagem</button>
+        <button onclick="generateOrEnhanceImage()">Gerar Imagem</button>
+    </div>
+    <div style="margin-top: 10px;">
+        <label class="toggle-switch">
+            <input type="checkbox" id="enhanceToggle" checked>
+            <span class="slider"></span>
+        </label>
+        <span class="mode-label">Modo de aprimoramento</span>
     </div>
     <div id="result"></div>
     <div class="history-header">
@@ -111,7 +181,7 @@
     <div id="history"></div>
 
     <script>
-        const HF_TOKEN = "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";
+        const HF_TOKEN = "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";
 
         async function query(data) {
             const response = await fetch(
@@ -181,67 +251,92 @@
                     },
                     method: "POST",
                     body: JSON.stringify({
-                        inputs: `You are an AI assistant helping users create perfect image prompts. Your task is to interpret the user's intention and create a detailed, vivid description for image generation.
+                        inputs: `You are an AI assistant specialized in creating prompts for image generation. Your task is to transform the user's prompt into a detailed visual description in English. Follow these instructions:
 
-                        Guidelines:
-                        1. Interpret the user's intention behind the prompt.
-                        2. Create a concise but vivid description in 1-2 sentences.
-                        3. Include specific visual details like colors, composition, and mood.
-                        4. If the prompt is abstract, translate it into a concrete visual representation.
-                        5. Write in English and avoid quotes or excessive punctuation.
-                        6. Start directly with the description.
+1. Create a visual description based on the user's prompt.
+2. Use 2-3 concise and vivid sentences.
+3. Include details about colors, composition, artistic style, and atmosphere.
+4. If the prompt is abstract, create a concrete visual representation.
+5. Write in English, without using quotation marks.
+6. Do not include phrases like "Enhanced prompt:" or "Response:".
+7. Do not ask the user to complete or respond to anything.
+8. Start immediately with the image description.
 
-                        Original prompt: "${userPrompt}"
-                        
-                        Enhanced prompt:`,
+User's prompt: "${userPrompt}"
+
+Visual description:`,
                         parameters: {
-                            max_new_tokens: 75,
+                            max_new_tokens: 100,
                             return_full_text: false,
+                            temperature: 0.7,
+                            top_p: 0.9,
                         },
                     }),
                 }
             );
             const result = await response.json();
-            return result[0].generated_text.trim();
+            let enhancedPrompt = result[0].generated_text.trim();
+            
+            // Remove any unwanted prefixes or instructions
+            enhancedPrompt = enhancedPrompt.replace(/^(Enhanced prompt:|Response:|Visual description:)\s*/i, '');
+            enhancedPrompt = enhancedPrompt.replace(/^.*\(.*\).*$/m, '');
+            
+            return enhancedPrompt;
         }
 
-        async function enhanceAndGenerateImage() {
-            const userPrompt = document.getElementById('prompt').value;
+        function showLoading(message) {
             const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="loading"></div>
+                <p>${message}</p>
+            `;
+        }
+
+        async function generateOrEnhanceImage() {
+            const userPrompt = document.getElementById('prompt').value;
+            const enhanceMode = document.getElementById('enhanceToggle').checked;
             
-            resultDiv.innerHTML = 'Aprimorando o prompt...';
+            if (enhanceMode) {
+                await enhanceAndGenerateImage(userPrompt);
+            } else {
+                await generateImage(userPrompt);
+            }
+        }
+
+        async function enhanceAndGenerateImage(userPrompt) {
+            showLoading('Aprimorando o prompt...');
             
             try {
                 const enhancedPrompt = await enhancePrompt(userPrompt);
-                resultDiv.innerHTML = 'Gerando imagem com o prompt aprimorado...';
+                showLoading('Gerando imagem com o prompt aprimorado...');
                 
                 const response = await query({"inputs": enhancedPrompt});
                 const imageUrl = URL.createObjectURL(response);
-                resultDiv.innerHTML = `
+                document.getElementById('result').innerHTML = `
                     <img src="${imageUrl}" alt="Imagem gerada">
                     <p>Prompt original: ${userPrompt}</p>
-                    <p>Prompt aprimorado: ${enhancedPrompt}</p>
+                    <p>Prompt aprimorado (em inglês): ${enhancedPrompt}</p>
                 `;
                 await updateHistory(response, enhancedPrompt);
             } catch (error) {
-                resultDiv.innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
+                document.getElementById('result').innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
                 console.error('Erro:', error);
             }
         }
 
-        async function generateImage() {
-            const prompt = document.getElementById('prompt').value;
-            const resultDiv = document.getElementById('result');
-            
-            resultDiv.innerHTML = 'Gerando imagem...';
+        async function generateImage(prompt) {
+            showLoading('Gerando imagem...');
             
             try {
                 const response = await query({"inputs": prompt});
                 const imageUrl = URL.createObjectURL(response);
-                resultDiv.innerHTML = `<img src="${imageUrl}" alt="Imagem gerada">`;
+                document.getElementById('result').innerHTML = `
+                    <img src="${imageUrl}" alt="Imagem gerada">
+                    <p>Prompt: ${prompt}</p>
+                `;
                 await updateHistory(response, prompt);
             } catch (error) {
-                resultDiv.innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
+                document.getElementById('result').innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
                 console.error('Erro:', error);
             }
         }
@@ -258,7 +353,7 @@
         // Adicione esta função para lidar com o evento de tecla pressionada
         function handleKeyPress(event) {
             if (event.key === "Enter") {
-                enhanceAndGenerateImage();
+                generateOrEnhanceImage();
             }
         }
 
