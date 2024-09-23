@@ -11,19 +11,24 @@
             margin: 0 auto;
             padding: 20px;
             text-align: center;
-            background-color: #2c2c2c;
+            background-color: #1e1e1e;
             color: #ffffff;
         }
         h1 {
             color: #4CAF50;
             margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .input-container {
+            display: flex;
+            margin-bottom: 20px;
         }
         input[type="text"] {
-            width: 100%;
+            flex-grow: 1;
             padding: 12px;
-            margin: 10px 0;
             border: none;
-            border-radius: 5px;
+            border-radius: 5px 0 0 5px;
             background-color: #3a3a3a;
             color: #ffffff;
             font-size: 16px;
@@ -33,7 +38,7 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 0 5px 5px 0;
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s;
@@ -43,14 +48,16 @@
         }
         #result {
             margin-top: 30px;
-            background-color: #3a3a3a;
+            background-color: #2a2a2a;
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         img {
             max-width: 100%;
             height: auto;
             border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         #history {
             display: flex;
@@ -92,8 +99,10 @@
 </head>
 <body>
     <h1>flux.01</h1>
-    <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
-    <button onclick="enhanceAndGenerateImage()">Gerar Imagem</button>
+    <div class="input-container">
+        <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
+        <button onclick="enhanceAndGenerateImage()">Gerar Imagem</button>
+    </div>
     <div id="result"></div>
     <div class="history-header">
         <h2>Histórico de Imagens</h2>
@@ -102,7 +111,7 @@
     <div id="history"></div>
 
     <script>
-        const HF_TOKEN = "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";
+        const HF_TOKEN = "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";
 
         async function query(data) {
             const response = await fetch(
@@ -245,6 +254,16 @@
 
         // Exibir o histórico ao carregar a página
         displayHistory();
+
+        // Adicione esta função para lidar com o evento de tecla pressionada
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                enhanceAndGenerateImage();
+            }
+        }
+
+        // Adicione um event listener para o campo de entrada
+        document.getElementById('prompt').addEventListener('keypress', handleKeyPress);
     </script>
 </body>
 </html>
