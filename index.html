@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
             padding: 20px;
             text-align: center;
@@ -25,6 +25,7 @@
             align-items: center;
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
         }
         input[type="text"] {
             flex-grow: 1;
@@ -36,6 +37,7 @@
             font-size: 16px;
             outline: none;
             transition: border-color 0.3s, box-shadow 0.3s;
+            min-width: 200px;
         }
         input[type="text"]:focus {
             border-color: #00b894;
@@ -53,6 +55,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            min-width: 50px;
         }
         button:disabled {
             background-color: #555;
@@ -72,6 +75,8 @@
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             position: relative;
+            max-width: 90%;
+            margin: 0 auto;
         }
         img {
             max-width: 100%;
@@ -86,10 +91,10 @@
             margin-top: 30px;
         }
         #history img {
-            width: 150px;
-            height: 150px;
+            width: 200px;
+            height: 200px;
             object-fit: cover;
-            margin: 5px;
+            margin: 10px;
             cursor: pointer;
             border-radius: 5px;
             transition: transform 0.3s, box-shadow 0.3s;
@@ -254,16 +259,7 @@
                     },
                     method: "POST",
                     body: JSON.stringify({
-                        inputs: `You are an AI artist specialized in creating detailed and vivid visual descriptions for image generation. Your task is to transform the user's prompt into an artistic masterpiece. Follow these instructions:
-
-1. Use the user's prompt as inspiration to create a detailed and vivid visual description.
-2. Be creative and imaginative, adding artistic elements and details.
-3. Include descriptions of colors, composition, artistic style, and atmosphere.
-4. If the prompt is abstract, create a concrete visual representation.
-5. Write in English, without using quotation marks.
-6. Do not include phrases like "Enhanced prompt:" or "Response:".
-7. Do not ask the user to complete or respond to anything.
-8. Start immediately with the image description.
+                        inputs: `You are an AI artist. Transform the user's prompt into a detailed and vivid visual description for image generation. Describe the image to be created, including colors, composition, and atmosphere. Write in English. Do not mention painting styles, image sizes, or other unnecessary details. Ensure the description is concise and complete, not exceeding 100 words.
 
 User's prompt: "${userPrompt}"
 
@@ -278,7 +274,7 @@ Visual description:`,
                 }
             );
             if (!response.ok) {
-                throw new Error('Erro na consulta ao modelo de aprimoramento de prompts');
+                throw new Error('Error querying the prompt enhancement model');
             }
             const result = await response.json();
             let enhancedPrompt = result[0]?.generated_text?.trim() || '';
@@ -286,6 +282,27 @@ Visual description:`,
             // Remove any unwanted prefixes or instructions
             enhancedPrompt = enhancedPrompt.replace(/^(Enhanced prompt:|Response:|Visual description:)\s*/i, '');
             enhancedPrompt = enhancedPrompt.replace(/^.*\(.*\).*$/m, '');
+            
+            // Ensure the prompt is complete and concise
+            if (enhancedPrompt.endsWith('...')) {
+                const lastPeriodIndex = enhancedPrompt.lastIndexOf('.');
+                if (lastPeriodIndex !== -1) {
+                    enhancedPrompt = enhancedPrompt.slice(0, lastPeriodIndex + 1).trim();
+                } else {
+                    enhancedPrompt = enhancedPrompt.slice(0, -3).trim();
+                }
+            }
+            
+            // Limit the prompt to 100 words
+            const words = enhancedPrompt.split(' ');
+            if (words.length > 100) {
+                enhancedPrompt = words.slice(0, 100).join(' ').trim();
+            }
+            
+            // Ensure the prompt does not end abruptly
+            if (enhancedPrompt.endsWith(',')) {
+                enhancedPrompt = enhancedPrompt.slice(0, -1).trim();
+            }
             
             return enhancedPrompt;
         }
