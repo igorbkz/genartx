@@ -11,11 +11,11 @@
             margin: 0 auto;
             padding: 20px;
             text-align: center;
-            background: #333;
-            color: #f5f5f5;
+            background: #1e1e1e; /* Fundo mais escuro */
+            color: #e0e0e0; /* Texto mais neutro */
         }
         h1 {
-            color: #f5f5f5;
+            color: #e0e0e0;
             margin-bottom: 30px;
             font-size: 2.5em;
             font-weight: 300;
@@ -30,22 +30,22 @@
         input[type="text"] {
             flex-grow: 1;
             padding: 12px;
-            border: 1px solid #555;
+            border: 1px solid #444;
             border-radius: 5px 0 0 5px;
-            background-color: #444;
-            color: #f5f5f5;
+            background-color: #333;
+            color: #e0e0e0;
             font-size: 16px;
             outline: none;
             transition: border-color 0.3s, box-shadow 0.3s;
             min-width: 200px;
         }
         input[type="text"]:focus {
-            border-color: #00b894;
-            box-shadow: 0 0 10px rgba(0, 184, 148, 0.2);
+            border-color: #888;
+            box-shadow: 0 0 10px rgba(136, 136, 136, 0.2);
         }
         button {
             padding: 12px;
-            background-color: #00b894;
+            background-color: #888;
             color: white;
             border: none;
             border-radius: 0 5px 5px 0;
@@ -58,11 +58,11 @@
             min-width: 50px;
         }
         button:disabled {
-            background-color: #555;
+            background-color: #444;
             cursor: not-allowed;
         }
         button:hover:not(:disabled) {
-            background-color: #019875;
+            background-color: #666;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         #result-container {
@@ -70,7 +70,7 @@
             display: none;
         }
         #result {
-            background-color: #444;
+            background-color: #333;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -91,8 +91,9 @@
             margin-top: 30px;
         }
         #history img {
-            width: 200px;
-            height: 200px;
+            width: 100%;
+            max-width: 200px;
+            height: auto;
             object-fit: cover;
             margin: 10px;
             cursor: pointer;
@@ -109,11 +110,11 @@
             border: none;
             cursor: pointer;
             padding: 5px 10px;
-            color: #00b894;
+            color: #888;
             transition: color 0.3s;
         }
         .refresh-button:hover {
-            color: #019875;
+            color: #666;
         }
         .history-header {
             display: flex;
@@ -132,7 +133,7 @@
             height: 50px;
             border: 3px solid rgba(0,0,0,.1);
             border-radius: 50%;
-            border-top-color: #00b894;
+            border-top-color: #888;
             animation: spin 1s ease-in-out infinite;
         }
 
@@ -161,7 +162,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #444;
             transition: .4s;
             border-radius: 20px;
         }
@@ -179,7 +180,7 @@
         }
 
         input:checked + .slider {
-            background-color: #00b894;
+            background-color: #888;
         }
 
         input:checked + .slider:before {
@@ -199,11 +200,25 @@
             left: 10px;
             cursor: pointer;
             font-size: 24px;
-            color: #00b894;
+            color: #888;
         }
 
         .prompt-toggle:hover {
-            color: #019875;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            #result img {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        @media (min-width: 601px) {
+            #result img {
+                max-width: 60%;
+                height: auto;
+            }
         }
     </style>
 </head>
@@ -211,7 +226,7 @@
     <h1>Flux</h1>
     <div class="input-container">
         <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
-        <button id="generateButton" onclick="generateOrEnhanceImage()">🖌️</button>
+        <button id="generateButton" onclick="generateOrEnhanceImage()">🎨</button> <!-- Atualizado para um ícone mais elegante -->
         <label class="toggle-switch">
             <input type="checkbox" id="enhanceToggle" checked>
             <span class="slider"></span>
@@ -224,7 +239,7 @@
     <div id="history"></div>
     <div class="history-header">
         <h2>Histórico de Imagens</h2>
-        <button class="refresh-button" onclick="confirmClearHistory()" title="Limpar histórico">🔄</button>
+        <button class="refresh-button" onclick="confirmClearHistory()" title="Limpar histórico">🔄</button> <!-- Atualizado para um ícone mais elegante -->
     </div>
 
     <script>
