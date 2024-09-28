@@ -220,18 +220,209 @@
                 height: auto;
             }
         }
+
+        /* Adicionar feedback visual ao botão */
+        button.loading {
+            background-color: #666;
+            cursor: wait;
+        }
+
+        /* Melhorar a responsividade do histórico de imagens */
+        @media (max-width: 600px) {
+            #history img {
+                max-width: 100px;
+            }
+        }
+
+        /* Adicionar animações suaves */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Estilos para o modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .modal-content {
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Estilos para o tema claro/escuro */
+        body.light-mode {
+            background: #f0f0f0;
+            color: #1e1e1e;
+        }
+
+        body.light-mode .modal-content {
+            background-color: #fff;
+            color: #1e1e1e;
+        }
+
+        body.light-mode button,
+        body.light-mode input[type="text"] {
+            background-color: #ddd;
+            color: #1e1e1e;
+        }
+
+        body.light-mode .toggle-switch .slider {
+            background-color: #ccc;
+        }
+
+        body.light-mode .toggle-switch input:checked + .slider {
+            background-color: #888;
+        }
+
+        body.light-mode .mode-label {
+            color: #1e1e1e;
+        }
+
+        /* Estilos para tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position the tooltip above the text */
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Estilo para o botão de alternância de tema */
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #888;
+            transition: color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            color: #666;
+        }
+
+        /* Estilo para o botão de ajuda */
+        .help-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #888;
+            transition: color 0.3s;
+        }
+
+        .help-button:hover {
+            color: #666;
+        }
+
+        /* Feedback visual ao campo de entrada */
+        input[type="text"]:focus {
+            border-color: #888;
+            box-shadow: 0 0 10px rgba(136, 136, 136, 0.2);
+        }
+
+        /* Estilo para o símbolo de carregamento */
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #888;
+            animation: spin 0.8s linear infinite; /* Alterado para linear e 0.8s */
+            margin: 0 auto; /* Centralizar */
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Estilo para o texto de carregamento */
+        .loading-text {
+            animation: colorChange 5s infinite; /* Alterado para 5 segundos */
+        }
+
+        @keyframes colorChange {
+            0% { color: #e0e0e0; }
+            25% { color: #888; }
+            50% { color: #ff6347; } /* Tomate */
+            75% { color: #4682b4; } /* Azul aço */
+            100% { color: #e0e0e0; }
+        }
     </style>
+    <!-- Adicionar link para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <h1>Flux</h1>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema"><i class="fas fa-adjust"></i></button> <!-- Botão para alternar entre temas -->
+    <button class="help-button" onclick="showHelp()" title="Ajuda"><i class="fas fa-question-circle"></i></button> <!-- Botão de ajuda -->
+    <h1 id="genArtTitle">GenArt</h1> <!-- Alterado para GenArt -->
     <div class="input-container">
         <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
-        <button id="generateButton" onclick="generateOrEnhanceImage()">🎨</button> <!-- Atualizado para um ícone mais elegante -->
-        <label class="toggle-switch">
-            <input type="checkbox" id="enhanceToggle" checked>
-            <span class="slider"></span>
-        </label>
-        <span class="mode-label">✨</span>
+        <button id="generateButton" onclick="generateOrEnhanceImage()"><i class="fas fa-paint-brush"></i></button> <!-- Atualizado para um ícone mais elegante -->
     </div>
     <div id="result-container">
         <div id="result"></div>
@@ -239,7 +430,27 @@
     <div id="history"></div>
     <div class="history-header">
         <h2>Histórico de Imagens</h2>
-        <button class="refresh-button" onclick="confirmClearHistory()" title="Limpar histórico">🔄</button> <!-- Atualizado para um ícone mais elegante -->
+        <button class="refresh-button" onclick="confirmClearHistory()" title="Limpar histórico"><i class="fas fa-sync-alt"></i></button> <!-- Atualizado para um ícone mais elegante -->
+    </div>
+
+    <!-- Modal para exibir imagens em tamanho completo -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img id="modalImage" src="" alt="Imagem em tamanho completo">
+            <p id="modalPrompt"></p>
+        </div>
+    </div>
+
+    <!-- Modal de ajuda -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHelpModal()">&times;</span>
+            <h2>Ajuda</h2>
+            <p>Digite um prompt no campo de entrada e clique no botão <i class="fas fa-paint-brush"></i> para gerar uma imagem.</p>
+            <p>Você pode alternar entre o modo claro e escuro clicando no botão <i class="fas fa-adjust"></i> no canto superior esquerdo.</p>
+            <p>Para ver o histórico de imagens geradas, role para baixo.</p>
+        </div>
     </div>
 
     <script>
@@ -357,14 +568,17 @@ Visual description:`,
         }
 
         function showFullImage(url, prompt) {
-            const resultContainer = document.getElementById('result-container');
-            const resultDiv = document.getElementById('result');
-            resultContainer.style.display = 'block';
-            resultDiv.innerHTML = `
-                <img src="${url}" alt="Imagem em tamanho completo">
-                <p id="promptText" style="display: none;">Prompt: ${prompt}</p>
-                <div class="prompt-toggle" onclick="togglePromptVisibility()">👁️</div>
-            `;
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalPrompt = document.getElementById('modalPrompt');
+            modal.style.display = 'block';
+            modalImage.src = url;
+            modalPrompt.textContent = `Prompt: ${prompt}`;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
         }
 
         function togglePromptVisibility() {
@@ -379,9 +593,22 @@ Visual description:`,
             const resultDiv = document.getElementById('result');
             resultContainer.style.display = 'block';
             resultDiv.innerHTML = `
-                <div class="loading"></div>
+                <div class="loading-spinner"></div>
                 <p>${message}</p>
             `;
+        }
+
+        // Adicionar feedback visual ao botão
+        function setLoadingState(isLoading) {
+            const generateButton = document.getElementById('generateButton');
+            const genArtTitle = document.getElementById('genArtTitle');
+            if (isLoading) {
+                generateButton.disabled = true;
+                genArtTitle.classList.add('loading-text'); // Adicionar classe de animação
+            } else {
+                generateButton.disabled = false;
+                genArtTitle.classList.remove('loading-text'); // Remover classe de animação
+            }
         }
 
         async function generateOrEnhanceImage() {
@@ -390,20 +617,20 @@ Visual description:`,
                 alert('Por favor, insira um prompt.');
                 return;
             }
-            const enhanceMode = document.getElementById('enhanceToggle').checked;
-            const generateButton = document.getElementById('generateButton');
             
             // Desativar o botão de geração de imagem
-            generateButton.disabled = true;
+            setLoadingState(true);
             
-            if (enhanceMode) {
-                await enhanceAndGenerateImage(userPrompt);
-            } else {
-                await generateImage(userPrompt);
-            }
+            await enhanceAndGenerateImage(userPrompt);
             
             // Reativar o botão de geração de imagem
-            generateButton.disabled = false;
+            setLoadingState(false);
+        }
+
+        // Melhorar a exibição de mensagens de erro
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<p style="color: red;">${message}</p>`;
         }
 
         async function enhanceAndGenerateImage(userPrompt) {
@@ -422,34 +649,13 @@ Visual description:`,
                 const resultDiv = document.getElementById('result');
                 resultContainer.style.display = 'block';
                 resultDiv.innerHTML = `
-                    <img src="${imageUrl}" alt="Imagem gerada">
+                    <img src="${imageUrl}" alt="Imagem gerada" class="fade-in">
                     <p id="promptText" style="display: none;">Prompt original: ${userPrompt}<br>Prompt aprimorado (em inglês): ${enhancedPrompt}</p>
-                    <div class="prompt-toggle" onclick="togglePromptVisibility()">👁️</div>
+                    <div class="prompt-toggle" onclick="togglePromptVisibility()"><i class="fas fa-eye"></i></div>
                 `;
                 await updateHistory(response, enhancedPrompt);
             } catch (error) {
-                document.getElementById('result').innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
-                console.error('Erro:', error);
-            }
-        }
-
-        async function generateImage(prompt) {
-            showLoading('Gerando imagem...');
-            
-            try {
-                const response = await queryImageGeneration({"inputs": prompt});
-                const imageUrl = URL.createObjectURL(response);
-                const resultContainer = document.getElementById('result-container');
-                const resultDiv = document.getElementById('result');
-                resultContainer.style.display = 'block';
-                resultDiv.innerHTML = `
-                    <img src="${imageUrl}" alt="Imagem gerada">
-                    <p id="promptText" style="display: none;">Prompt: ${prompt}</p>
-                    <div class="prompt-toggle" onclick="togglePromptVisibility()">👁️</div>
-                `;
-                await updateHistory(response, prompt);
-            } catch (error) {
-                document.getElementById('result').innerHTML = 'Erro ao gerar a imagem. Por favor, tente novamente.';
+                showError('Erro ao gerar a imagem. Por favor, tente novamente.');
                 console.error('Erro:', error);
             }
         }
@@ -478,6 +684,49 @@ Visual description:`,
 
         // Adicione um event listener para o campo de entrada
         document.getElementById('prompt').addEventListener('keypress', handleKeyPress);
+
+        // Salvar o estado do toggle entre sessões
+        document.getElementById('enhanceToggle').addEventListener('change', function() {
+            localStorage.setItem('enhanceToggle', this.checked);
+        });
+
+        window.addEventListener('load', function() {
+            const enhanceToggleState = localStorage.getItem('enhanceToggle');
+            if (enhanceToggleState !== null) {
+                document.getElementById('enhanceToggle').checked = enhanceToggleState === 'true';
+            }
+        });
+
+        // Alternar entre temas claro e escuro
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        // Carregar o tema salvo
+        window.addEventListener('load', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        });
+
+        // Mostrar modal de ajuda
+        function showHelp() {
+            const helpModal = document.getElementById('helpModal');
+            helpModal.style.display = 'block';
+        }
+
+        // Fechar modal de ajuda
+        function closeHelpModal() {
+            const helpModal = document.getElementById('helpModal');
+            helpModal.style.display = 'none';
+        }
+
+        // Definir prompt a partir de sugestões
+        function setPrompt(prompt) {
+            document.getElementById('prompt').value = prompt;
+        }
     </script>
 </body>
 </html>
