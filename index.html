@@ -11,8 +11,8 @@
             margin: 0 auto;
             padding: 20px;
             text-align: center;
-            background: #1e1e1e; /* Fundo mais escuro */
-            color: #e0e0e0; /* Texto mais neutro */
+            background: #1e1e1e;
+            color: #e0e0e0;
         }
         h1 {
             color: #e0e0e0;
@@ -136,11 +136,9 @@
             border-top-color: #888;
             animation: spin 1s ease-in-out infinite;
         }
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -148,13 +146,11 @@
             height: 20px;
             margin-left: 10px;
         }
-
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-
         .slider {
             position: absolute;
             cursor: pointer;
@@ -166,7 +162,6 @@
             transition: .4s;
             border-radius: 20px;
         }
-
         .slider:before {
             position: absolute;
             content: "";
@@ -178,22 +173,18 @@
             transition: .4s;
             border-radius: 50%;
         }
-
         input:checked + .slider {
             background-color: #888;
         }
-
         input:checked + .slider:before {
             transform: translateX(20px);
         }
-
         .mode-label {
             margin-left: 10px;
             vertical-align: super;
             color: #ccc;
             font-size: 14px;
         }
-
         .prompt-toggle {
             position: absolute;
             bottom: 10px;
@@ -202,49 +193,37 @@
             font-size: 24px;
             color: #888;
         }
-
         .prompt-toggle:hover {
             color: #666;
         }
-
         @media (max-width: 600px) {
             #result img {
                 max-width: 100%;
                 height: auto;
             }
         }
-
         @media (min-width: 601px) {
             #result img {
                 max-width: 60%;
                 height: auto;
             }
         }
-
-        /* Adicionar feedback visual ao botão */
         button.loading {
             background-color: #666;
             cursor: wait;
         }
-
-        /* Melhorar a responsividade do histórico de imagens */
         @media (max-width: 600px) {
             #history img {
                 max-width: 100px;
             }
         }
-
-        /* Adicionar animações suaves */
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
-        /* Estilos para o modal */
         .modal {
             display: none;
             position: fixed;
@@ -257,7 +236,6 @@
             background-color: rgba(0,0,0,0.8);
             animation: fadeIn 0.5s ease-in-out;
         }
-
         .modal-content {
             margin: 15% auto;
             padding: 20px;
@@ -268,56 +246,44 @@
             color: #e0e0e0;
             border-radius: 10px;
         }
-
         .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
-
         .close:hover,
         .close:focus {
             color: #fff;
             text-decoration: none;
             cursor: pointer;
         }
-
-        /* Estilos para o tema claro/escuro */
         body.light-mode {
             background: #f0f0f0;
             color: #1e1e1e;
         }
-
         body.light-mode .modal-content {
             background-color: #fff;
             color: #1e1e1e;
         }
-
         body.light-mode button,
         body.light-mode input[type="text"] {
             background-color: #ddd;
             color: #1e1e1e;
         }
-
         body.light-mode .toggle-switch .slider {
             background-color: #ccc;
         }
-
         body.light-mode .toggle-switch input:checked + .slider {
             background-color: #888;
         }
-
         body.light-mode .mode-label {
             color: #1e1e1e;
         }
-
-        /* Estilos para tooltips */
         .tooltip {
             position: relative;
             display: inline-block;
         }
-
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 120px;
@@ -328,19 +294,16 @@
             padding: 5px;
             position: absolute;
             z-index: 1;
-            bottom: 125%; /* Position the tooltip above the text */
+            bottom: 125%;
             left: 50%;
             margin-left: -60px;
             opacity: 0;
             transition: opacity 0.3s;
         }
-
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
         }
-
-        /* Estilo para o botão de alternância de tema */
         .theme-toggle {
             position: absolute;
             top: 10px;
@@ -352,12 +315,9 @@
             color: #888;
             transition: color 0.3s;
         }
-
         .theme-toggle:hover {
             color: #666;
         }
-
-        /* Estilo para o botão de ajuda */
         .help-button {
             position: absolute;
             top: 10px;
@@ -369,60 +329,38 @@
             color: #888;
             transition: color 0.3s;
         }
-
         .help-button:hover {
             color: #666;
         }
-
-        /* Feedback visual ao campo de entrada */
-        input[type="text"]:focus {
-            border-color: #888;
-            box-shadow: 0 0 10px rgba(136, 136, 136, 0.2);
-        }
-
-        /* Estilo para o símbolo de carregamento */
         .loading-spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             width: 36px;
             height: 36px;
             border-radius: 50%;
             border-left-color: #888;
-            animation: spin 0.8s linear infinite; /* Alterado para linear e 0.8s */
-            margin: 0 auto; /* Centralizar */
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
         }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Estilo para o texto de carregamento */
         .loading-text {
-            animation: colorChange 5s infinite; /* Alterado para 5 segundos */
+            animation: colorChange 5s infinite;
         }
-
         @keyframes colorChange {
             0% { color: #e0e0e0; }
             25% { color: #888; }
-            50% { color: #ff6347; } /* Tomate */
-            75% { color: #4682b4; } /* Azul aço */
+            50% { color: #ff6347; }
+            75% { color: #4682b4; }
             100% { color: #e0e0e0; }
         }
     </style>
-    <!-- Adicionar link para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema"><i class="fas fa-adjust"></i></button> <!-- Botão para alternar entre temas -->
-    <button class="help-button" onclick="showHelp()" title="Ajuda"><i class="fas fa-question-circle"></i></button> <!-- Botão de ajuda -->
-    <h1 id="genArtTitle">GenArt</h1> <!-- Alterado para GenArt -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema"><i class="fas fa-adjust"></i></button>
+    <button class="help-button" onclick="showHelp()" title="Ajuda"><i class="fas fa-question-circle"></i></button>
+    <h1 id="genArtTitle">GenArt</h1>
     <div class="input-container">
         <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
-        <button id="generateButton" onclick="generateOrEnhanceImage()"><i class="fas fa-paint-brush"></i></button> <!-- Atualizado para um ícone mais elegante -->
+        <button id="generateButton" onclick="generateOrEnhanceImage()"><i class="fas fa-paint-brush"></i></button>
     </div>
     <div id="result-container">
         <div id="result"></div>
@@ -430,10 +368,8 @@
     <div id="history"></div>
     <div class="history-header">
         <h2>Histórico de Imagens</h2>
-        <button class="refresh-button" onclick="confirmClearHistory()" title="Limpar histórico"><i class="fas fa-sync-alt"></i></button> <!-- Atualizado para um ícone mais elegante -->
+        <button class="refresh-button" onclick="confirmClearHistory()" title="Limpar histórico"><i class="fas fa-sync-alt"></i></button>
     </div>
-
-    <!-- Modal para exibir imagens em tamanho completo -->
     <div id="imageModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -441,8 +377,6 @@
             <p id="modalPrompt"></p>
         </div>
     </div>
-
-    <!-- Modal de ajuda -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeHelpModal()">&times;</span>
@@ -452,7 +386,6 @@
             <p>Para ver o histórico de imagens geradas, role para baixo.</p>
         </div>
     </div>
-
     <script>
         const HF_TOKEN = "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";
 
@@ -505,11 +438,9 @@ Visual description:`,
             const result = await response.json();
             let enhancedPrompt = result[0]?.generated_text?.trim() || '';
             
-            // Remove any unwanted prefixes or instructions
             enhancedPrompt = enhancedPrompt.replace(/^(Enhanced prompt:|Response:|Visual description:)\s*/i, '');
             enhancedPrompt = enhancedPrompt.replace(/^.*\(.*\).*$/m, '');
             
-            // Ensure the prompt is complete and concise
             if (enhancedPrompt.endsWith('...')) {
                 const lastPeriodIndex = enhancedPrompt.lastIndexOf('.');
                 if (lastPeriodIndex !== -1) {
@@ -519,13 +450,11 @@ Visual description:`,
                 }
             }
             
-            // Limit the prompt to 100 words
             const words = enhancedPrompt.split(' ');
             if (words.length > 100) {
                 enhancedPrompt = words.slice(0, 100).join(' ').trim();
             }
             
-            // Ensure the prompt does not end abruptly
             if (enhancedPrompt.endsWith(',')) {
                 enhancedPrompt = enhancedPrompt.slice(0, -1).trim();
             }
@@ -598,16 +527,15 @@ Visual description:`,
             `;
         }
 
-        // Adicionar feedback visual ao botão
         function setLoadingState(isLoading) {
             const generateButton = document.getElementById('generateButton');
             const genArtTitle = document.getElementById('genArtTitle');
             if (isLoading) {
                 generateButton.disabled = true;
-                genArtTitle.classList.add('loading-text'); // Adicionar classe de animação
+                genArtTitle.classList.add('loading-text');
             } else {
                 generateButton.disabled = false;
-                genArtTitle.classList.remove('loading-text'); // Remover classe de animação
+                genArtTitle.classList.remove('loading-text');
             }
         }
 
@@ -618,16 +546,13 @@ Visual description:`,
                 return;
             }
             
-            // Desativar o botão de geração de imagem
             setLoadingState(true);
             
             await enhanceAndGenerateImage(userPrompt);
             
-            // Reativar o botão de geração de imagem
             setLoadingState(false);
         }
 
-        // Melhorar a exibição de mensagens de erro
         function showError(message) {
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = `<p style="color: red;">${message}</p>`;
@@ -672,20 +597,16 @@ Visual description:`,
             displayHistory();
         }
 
-        // Exibir o histórico ao carregar a página
         displayHistory();
 
-        // Adicione esta função para lidar com o evento de tecla pressionada
         function handleKeyPress(event) {
             if (event.key === "Enter") {
                 generateOrEnhanceImage();
             }
         }
 
-        // Adicione um event listener para o campo de entrada
         document.getElementById('prompt').addEventListener('keypress', handleKeyPress);
 
-        // Salvar o estado do toggle entre sessões
         document.getElementById('enhanceToggle').addEventListener('change', function() {
             localStorage.setItem('enhanceToggle', this.checked);
         });
@@ -697,13 +618,11 @@ Visual description:`,
             }
         });
 
-        // Alternar entre temas claro e escuro
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
         }
 
-        // Carregar o tema salvo
         window.addEventListener('load', function() {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'light') {
@@ -711,19 +630,16 @@ Visual description:`,
             }
         });
 
-        // Mostrar modal de ajuda
         function showHelp() {
             const helpModal = document.getElementById('helpModal');
             helpModal.style.display = 'block';
         }
 
-        // Fechar modal de ajuda
         function closeHelpModal() {
             const helpModal = document.getElementById('helpModal');
             helpModal.style.display = 'none';
         }
 
-        // Definir prompt a partir de sugestões
         function setPrompt(prompt) {
             document.getElementById('prompt').value = prompt;
         }
