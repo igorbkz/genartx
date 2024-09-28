@@ -485,16 +485,12 @@
                     },
                     method: "POST",
                     body: JSON.stringify({
-                        inputs: `You are an AI artist. Transform the user's prompt into a detailed and vivid visual description for image generation. Describe the image to be created, including colors, composition, and atmosphere. Write in English. Do not mention painting styles, image sizes, or other unnecessary details. Ensure the description is concise and complete, not exceeding 100 words.
-
-User's prompt: "${userPrompt}"
-
-Visual description:`,
+                        inputs: `Enhance the following prompt for image generation: "${userPrompt}". Create a detailed visual description based on this prompt. Include specific details about colors, composition, and atmosphere that relate directly to the given prompt. Write in English, using 30-50 words. Do not add any disclaimers, sources, or additional text. Your entire response should be only the enhanced description.`,
                         parameters: {
-                            max_new_tokens: 150,
+                            max_new_tokens: 75,
                             return_full_text: false,
-                            temperature: 0.8,
-                            top_p: 0.95,
+                            temperature: 0.7,
+                            top_p: 0.9,
                         },
                     }),
                 }
@@ -503,34 +499,7 @@ Visual description:`,
                 throw new Error('Error querying the prompt enhancement model');
             }
             const result = await response.json();
-            let enhancedPrompt = result[0]?.generated_text?.trim() || '';
-            
-            // Remove any unwanted prefixes or instructions
-            enhancedPrompt = enhancedPrompt.replace(/^(Enhanced prompt:|Response:|Visual description:)\s*/i, '');
-            enhancedPrompt = enhancedPrompt.replace(/^.*\(.*\).*$/m, '');
-            
-            // Ensure the prompt is complete and concise
-            if (enhancedPrompt.endsWith('...')) {
-                const lastPeriodIndex = enhancedPrompt.lastIndexOf('.');
-                if (lastPeriodIndex !== -1) {
-                    enhancedPrompt = enhancedPrompt.slice(0, lastPeriodIndex + 1).trim();
-                } else {
-                    enhancedPrompt = enhancedPrompt.slice(0, -3).trim();
-                }
-            }
-            
-            // Limit the prompt to 100 words
-            const words = enhancedPrompt.split(' ');
-            if (words.length > 100) {
-                enhancedPrompt = words.slice(0, 100).join(' ').trim();
-            }
-            
-            // Ensure the prompt does not end abruptly
-            if (enhancedPrompt.endsWith(',')) {
-                enhancedPrompt = enhancedPrompt.slice(0, -1).trim();
-            }
-            
-            return enhancedPrompt;
+            return result[0]?.generated_text?.trim() || '';
         }
 
         let imageHistory = JSON.parse(localStorage.getItem('imageHistory')) || [];
@@ -603,61 +572,70 @@ Visual description:`,
             const generateButton = document.getElementById('generateButton');
             const genArtTitle = document.getElementById('genArtTitle');
             if (isLoading) {
-                generateButton.disabled = true;
-                genArtTitle.classList.add('loading-text'); // Adicionar classe de animação
+                generateButton.classList.add('loading');
+                genArtTitle.classList.add('loading-text');
             } else {
-                generateButton.disabled = false;
-                genArtTitle.classList.remove('loading-text'); // Remover classe de animação
+                generateButton.classList.remove('loading');
+                genArtTitle.classList.remove('loading-text');
             }
         }
 
         async function generateOrEnhanceImage() {
-            const userPrompt = document.getElementById('prompt').value.trim();
+            const promptInput = document.getElementById('prompt');
+            const userPrompt = promptInput.value.trim();
             if (!userPrompt) {
                 alert('Por favor, insira um prompt.');
                 return;
             }
             
-            // Desativar o botão de geração de imagem
-            setLoadingState(true);
+            // Limpar o campo de entrada imediatamente após o envio
+            promptInput.value = '';
             
-            await enhanceAndGenerateImage(userPrompt);
-            
-            // Reativar o botão de geração de imagem
-            setLoadingState(false);
-        }
-
-        // Melhorar a exibição de mensagens de erro
-        function showError(message) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `<p style="color: red;">${message}</p>`;
+            // Iniciar o processo de geração de imagem
+            enhanceAndGenerateImage(userPrompt);
         }
 
         async function enhanceAndGenerateImage(userPrompt) {
-            showLoading('Aprimorando o prompt...');
+            const resultContainer = document.getElementById('result-container');
+            const resultDiv = document.getElementById('result');
+            
+            // Criar um novo elemento para esta geração específica
+            const generationElement = document.createElement('div');
+            generationElement.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>Aprimorando o prompt...</p>
+            `;
+            resultDiv.insertBefore(generationElement, resultDiv.firstChild);
+            resultContainer.style.display = 'block';
             
             try {
                 const enhancedPrompt = await queryPromptEnhancement(userPrompt);
                 if (!enhancedPrompt) {
                     throw new Error('Prompt aprimorado vazio');
                 }
-                showLoading('Gerando imagem com o prompt aprimorado...');
+                generationElement.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <p>Gerando imagem com o prompt aprimorado...</p>
+                `;
                 
                 const response = await queryImageGeneration({"inputs": enhancedPrompt});
                 const imageUrl = URL.createObjectURL(response);
-                const resultContainer = document.getElementById('result-container');
-                const resultDiv = document.getElementById('result');
-                resultContainer.style.display = 'block';
-                resultDiv.innerHTML = `
+                
+                generationElement.innerHTML = `
                     <img src="${imageUrl}" alt="Imagem gerada" class="fade-in">
                     <p id="promptText" style="display: none;">Prompt original: ${userPrompt}<br>Prompt aprimorado (em inglês): ${enhancedPrompt}</p>
-                    <div class="prompt-toggle" onclick="togglePromptVisibility()"><i class="fas fa-eye"></i></div>
+                    <div class="prompt-toggle" onclick="togglePromptVisibility(this)"><i class="fas fa-eye"></i></div>
                 `;
                 await updateHistory(response, enhancedPrompt);
             } catch (error) {
-                showError('Erro ao gerar a imagem. Por favor, tente novamente.');
+                generationElement.innerHTML = `<p style="color: red;">Erro ao gerar a imagem. Por favor, tente novamente.</p>`;
                 console.error('Erro:', error);
             }
+        }
+
+        function togglePromptVisibility(element) {
+            const promptText = element.previousElementSibling;
+            promptText.style.display = promptText.style.display === 'none' ? 'block' : 'none';
         }
 
         function confirmClearHistory() {
