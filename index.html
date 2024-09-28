@@ -462,6 +462,18 @@ Visual description:`,
             return enhancedPrompt;
         }
 
+        function addSurpriseElements(prompt) {
+            const surpriseElements = [
+                "with a vibrant sunset in the background",
+                "surrounded by magical sparkles",
+                "with a futuristic cityscape",
+                "with a touch of surrealism",
+                "in a dreamlike atmosphere"
+            ];
+            const randomElement = surpriseElements[Math.floor(Math.random() * surpriseElements.length)];
+            return `${prompt} ${randomElement}`;
+        }
+
         let imageHistory = JSON.parse(localStorage.getItem('imageHistory')) || [];
 
         function blobToBase64(blob) {
@@ -562,10 +574,11 @@ Visual description:`,
             showLoading('Aprimorando o prompt...');
             
             try {
-                const enhancedPrompt = await queryPromptEnhancement(userPrompt);
+                let enhancedPrompt = await queryPromptEnhancement(userPrompt);
                 if (!enhancedPrompt) {
                     throw new Error('Prompt aprimorado vazio');
                 }
+                enhancedPrompt = addSurpriseElements(enhancedPrompt);
                 showLoading('Gerando imagem com o prompt aprimorado...');
                 
                 const response = await queryImageGeneration({"inputs": enhancedPrompt});
