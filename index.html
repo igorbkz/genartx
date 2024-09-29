@@ -407,10 +407,14 @@
 
         @keyframes colorChange {
             0% { color: #e0e0e0; }
-            25% { color: #888; }
-            50% { color: #ff6347; } /* Tomate */
-            75% { color: #4682b4; } /* Azul aço */
+            25% { color: #ff6347; } /* Tomate */
+            50% { color: #4682b4; } /* Azul aço */
+            75% { color: #32cd32; } /* Verde limão */
             100% { color: #e0e0e0; }
+        }
+
+        .color-changing {
+            animation: colorChange 2s linear infinite;
         }
     </style>
     <!-- Adicionar link para ícones -->
@@ -485,9 +489,9 @@
                     },
                     method: "POST",
                     body: JSON.stringify({
-                        inputs: `Enhance the following prompt for image generation: "${userPrompt}". Create a detailed visual description based on this prompt. Include specific details about colors, composition, and atmosphere that relate directly to the given prompt. Write in English, using 30-50 words. Do not add any disclaimers, sources, or additional text. Your entire response should be only the enhanced description.`,
+                        inputs: `Create a vivid and appealing image description based on this input: "${userPrompt}". Enhance the user's idea while staying true to their intent. Use 20-30 words to describe a visually striking scene. Focus on elements that would make an attractive image. Your entire response must be only the image description, without any additional text or explanations.`,
                         parameters: {
-                            max_new_tokens: 75,
+                            max_new_tokens: 80,
                             return_full_text: false,
                             temperature: 0.7,
                             top_p: 0.9,
@@ -499,7 +503,18 @@
                 throw new Error('Error querying the prompt enhancement model');
             }
             const result = await response.json();
-            return result[0]?.generated_text?.trim() || '';
+            let enhancedPrompt = result[0]?.generated_text?.trim() || '';
+            
+            // Remove any text after a period, if present
+            const periodIndex = enhancedPrompt.indexOf('.');
+            if (periodIndex !== -1) {
+                enhancedPrompt = enhancedPrompt.substring(0, periodIndex + 1);
+            }
+            
+            // Remove any text in parentheses or brackets
+            enhancedPrompt = enhancedPrompt.replace(/[\(\[].*?[\)\]]/g, '').trim();
+            
+            return enhancedPrompt;
         }
 
         let imageHistory = JSON.parse(localStorage.getItem('imageHistory')) || [];
@@ -591,8 +606,15 @@
             // Limpar o campo de entrada imediatamente após o envio
             promptInput.value = '';
             
+            // Iniciar a animação de mudança de cor
+            const genArtTitle = document.getElementById('genArtTitle');
+            genArtTitle.classList.add('color-changing');
+            
             // Iniciar o processo de geração de imagem
-            enhanceAndGenerateImage(userPrompt);
+            await enhanceAndGenerateImage(userPrompt);
+            
+            // Parar a animação de mudança de cor
+            genArtTitle.classList.remove('color-changing');
         }
 
         async function enhanceAndGenerateImage(userPrompt) {
