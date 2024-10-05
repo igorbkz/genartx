@@ -510,9 +510,10 @@
     <script>
         const HF_TOKEN = "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";
 
-        async function queryImageGeneration(data) {
+        // Substituir a função queryImageGeneration existente por esta nova função query
+        async function query(data) {
             const response = await fetch(
-                "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev",
+                "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
                 {
                     headers: {
                         Authorization: `Bearer ${HF_TOKEN}`,
@@ -690,7 +691,8 @@
                     <p>Gerando imagem com o prompt aprimorado...</p>
                 `;
                 
-                const response = await queryImageGeneration({"inputs": enhancedPrompt});
+                // Usar a nova função query aqui
+                const response = await query({"inputs": enhancedPrompt});
                 const imageUrl = URL.createObjectURL(response);
                 
                 generationElement.innerHTML = `
