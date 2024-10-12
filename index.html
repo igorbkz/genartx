@@ -466,6 +466,24 @@
         body.light-mode .help-button:hover {
             background-color: rgba(0, 0, 0, 0.2);
         }
+
+        .enhance-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #888;
+            padding: 10px;
+            transition: color 0.3s;
+        }
+
+        .enhance-toggle:hover {
+            color: #666;
+        }
+
+        .enhance-toggle.active {
+            color: #4CAF50;
+        }
     </style>
     <!-- Adicionar link para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -476,6 +494,9 @@
     <h1 id="genArtTitle">GenArt</h1> <!-- Alterado para GenArt -->
     <div class="input-container">
         <input type="text" id="prompt" placeholder="Imagine sua imagem aqui">
+        <button id="enhanceToggle" class="enhance-toggle" title="Alternar aprimoramento de prompt">
+            <i class="fas fa-magic"></i>
+        </button>
         <button id="generateButton" onclick="generateOrEnhanceImage()"><i class="fas fa-paint-brush"></i></button> <!-- Atualizado para um ícone mais elegante -->
     </div>
     <div id="result-container">
@@ -646,6 +667,15 @@
             }
         }
 
+        let enhancePrompt = true;
+
+        function toggleEnhancePrompt() {
+            enhancePrompt = !enhancePrompt;
+            const enhanceToggle = document.getElementById('enhanceToggle');
+            enhanceToggle.classList.toggle('active', enhancePrompt);
+            enhanceToggle.title = enhancePrompt ? "Aprimoramento de prompt ativado" : "Aprimoramento de prompt desativado";
+        }
+
         async function generateOrEnhanceImage() {
             const promptInput = document.getElementById('prompt');
             const userPrompt = promptInput.value.trim();
@@ -654,17 +684,17 @@
                 return;
             }
             
-            // Limpar o campo de entrada imediatamente após o envio
             promptInput.value = '';
             
-            // Iniciar a animação de mudança de cor
             const genArtTitle = document.getElementById('genArtTitle');
             genArtTitle.classList.add('color-changing');
             
-            // Iniciar o processo de geração de imagem
-            await enhanceAndGenerateImage(userPrompt);
+            if (enhancePrompt) {
+                await enhanceAndGenerateImage(userPrompt);
+            } else {
+                await generateImageWithoutEnhancement(userPrompt);
+            }
             
-            // Parar a animação de mudança de cor
             genArtTitle.classList.remove('color-changing');
         }
 
@@ -701,6 +731,34 @@
                     <div class="prompt-toggle" onclick="togglePromptVisibility(this)"><i class="fas fa-eye"></i></div>
                 `;
                 await updateHistory(response, enhancedPrompt);
+            } catch (error) {
+                generationElement.innerHTML = `<p style="color: red;">Erro ao gerar a imagem. Por favor, tente novamente.</p>`;
+                console.error('Erro:', error);
+            }
+        }
+
+        async function generateImageWithoutEnhancement(userPrompt) {
+            const resultContainer = document.getElementById('result-container');
+            const resultDiv = document.getElementById('result');
+            
+            const generationElement = document.createElement('div');
+            generationElement.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>Gerando imagem com o prompt original...</p>
+            `;
+            resultDiv.insertBefore(generationElement, resultDiv.firstChild);
+            resultContainer.style.display = 'block';
+            
+            try {
+                const response = await query({"inputs": userPrompt});
+                const imageUrl = URL.createObjectURL(response);
+                
+                generationElement.innerHTML = `
+                    <img src="${imageUrl}" alt="Imagem gerada" class="fade-in">
+                    <p id="promptText" style="display: none;">Prompt original: ${userPrompt}</p>
+                    <div class="prompt-toggle" onclick="togglePromptVisibility(this)"><i class="fas fa-eye"></i></div>
+                `;
+                await updateHistory(response, userPrompt);
             } catch (error) {
                 generationElement.innerHTML = `<p style="color: red;">Erro ao gerar a imagem. Por favor, tente novamente.</p>`;
                 console.error('Erro:', error);
@@ -779,6 +837,9 @@
         function setPrompt(prompt) {
             document.getElementById('prompt').value = prompt;
         }
+
+        // Adicione este event listener no final do script
+        document.getElementById('enhanceToggle').addEventListener('click', toggleEnhancePrompt);
     </script>
 </body>
 </html>
